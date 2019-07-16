@@ -1,7 +1,7 @@
 """
 Trader class with example
 
-@date: 15/05/2019
+@date: 16/07/2019
 @author: Quentin Lieumont
 """
 
