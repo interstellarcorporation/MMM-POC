@@ -51,3 +51,27 @@ class Trader:
             raise AttributeError(f"currencie in founds not recognized :\n\t{key} not in {self.currencies}")
         else:
             return True
+
+
+if __name__ == '__main__':
+    print("Trader class manipulation :")
+
+    print("")
+    print(">>> list_of_coins = [\"ACoin\",\"BCoin\"]")
+    print(">>> starting_founds = {\"a\": 2}")
+    print(">>> trader = Trader(list_of_coins,starting_founds)")
+    print(">>> trader.print_all()")
+    print("")
+
+    list_of_coins = ["ACoin", "BCoin"]
+    starting_founds = {"ACoin": 2}
+    trader = Trader(list_of_coins, starting_founds)
+    trader.print_all()
+
+    print("")
+    print(">>> trader.trade(\"ACoin\", \"BCoin\", 1, 100)")
+    print(">>> trader.print_all()")
+    print("")
+
+    trader.trade("ACoin", "BCoin", 1, 100)
+    trader.print_all()
