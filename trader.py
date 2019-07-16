@@ -1,3 +1,9 @@
+"""
+Trader class with example
+
+@date: 15/05/2019
+@author: Quentin Lieumont
+"""
 
 
 class Trader:
