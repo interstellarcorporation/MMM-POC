@@ -4,6 +4,7 @@ Trader class with example
 @date: 16/07/2019
 @author: Quentin Lieumont
 """
+import copy
 
 
 class Trader:
@@ -21,6 +22,7 @@ class Trader:
             for cur, value in base_founds.items():
                 if self._check_in_currencies(cur):
                     self.founds[cur] += value
+        self._history = [copy.deepcopy(self.founds)]
 
     def __getitem__(self, currency) -> float:
         return self.founds[currency]
@@ -36,19 +38,21 @@ class Trader:
         :param c2: currency 2
         :param amount: amount of currency 1 that will be convert in currency 2 with the exchange rate of exchange
         :param exchange: the exchange rate : c1 = exchange * c2
-        :return: the trading success or fail (bool)
         """
         if self._check_in_currencies(c1) and self._check_in_currencies(c2):
-            if self[c1] >= amount:
-                self.founds[c1] -= amount
-                self.founds[c2] += amount*exchange
-                return True
+            self.founds[c1] -= amount*exchange
+            self.founds[c2] += amount
+            self.history.append(copy.deepcopy(self.founds))
 
     # Properties
 
     @property
     def currencies(self):
         return self.founds.keys()
+
+    @property
+    def history(self):
+        return self._history
 
     # Private
 
