@@ -228,6 +228,3 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 .idea/
-
-*.json
-*.prejson
