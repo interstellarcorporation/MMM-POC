@@ -99,23 +99,22 @@ class FirstBTCTrader(Trader):
         return self.price_history.result
 
 
-def test_trader(step: float, delta: float, start: float = 1000, market_step: float = 1):
-    trader_up = FirstBTCTrader(start, step)
-    trader_do = FirstBTCTrader(start, step)
-    up = np.concatenate((np.arange(start, start + delta, market_step), np.arange(start + delta, start, -1 * market_step)))
-    do = np.concatenate((np.arange(start, start - delta, -1 * market_step), np.arange(start - delta, start, market_step)))
+def test_trader(prices: list, step: float, start: float = 1000):
+    trader = FirstBTCTrader(start, step)
 
-    for i in range(len(up)):
-        trader_up.update(up[i])
-        trader_do.update(do[i])
-        trader_up.run()
-        trader_do.run()
-    trader_up.got_to_obj()
-    trader_do.got_to_obj()
+    for price in prices:
+        trader.update(price)
+        trader.run()
+    trader.got_to_obj()
 
-    return trader_up.result, trader_do.result
+    return trader.result
 
 
 if __name__ == '__main__':
-    for i in range(50, 550, 50):
-        print(test_trader(i, 500))
+    prices = list(range(1000, 1500)) + list(range(1500, 1000, -1))
+    steps = range(50, 650, 5)
+    result = [test_trader(prices, st) for st in steps]
+
+    fig, ax = plt.subplots()
+    ax.plot(steps, result, ".k")
+    fig.show()
