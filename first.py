@@ -17,7 +17,7 @@ class BTCHistory:
 
     def __init__(self, start, colors=None):
         if colors is None:
-            self.colors = ['b', 'r', 'k']
+            self.colors = ["b", "r", "k"]
         else:
             self.colors = colors
         self.labels = ["USD", "BTC", "USD vs BTC"]
@@ -29,14 +29,14 @@ class BTCHistory:
     @property
     def plot(self) -> plt.Figure:
         # noinspection PyTypeChecker
-        fig, axs = plt.subplots(
-            nrows=3,
-            ncols=1,
-            sharex=True
-        )
+        fig, axs = plt.subplots(nrows=3, ncols=1, sharex=True)
 
         for i in range(3):
-            axs[i].plot([e[self.labels[i]] for e in self._prices_history], '+--', color=self.colors[i])
+            axs[i].plot(
+                [e[self.labels[i]] for e in self._prices_history],
+                "+--",
+                color=self.colors[i],
+            )
             axs[i].set_ylabel(self.labels[i])
 
         return fig
@@ -74,7 +74,7 @@ class FirstBTCTrader(Trader):
             pass
 
     def got_to_obj(self) -> None:
-        goal = self.obj/self.btc_price
+        goal = self.obj / self.btc_price
         # print(f"{goal} BTC = {goal*self.btc_price} USD")
         delta = goal - self.founds["BTC"]
         self.trade("USD", "BTC", delta, self.btc_price)
@@ -84,7 +84,7 @@ class FirstBTCTrader(Trader):
         self.price_history.plot.show()
 
     def _check_block(self) -> bool:
-        middle = self.obj + self.current_step*self.step
+        middle = self.obj + self.current_step * self.step
         if self.btc_price >= middle + self.step:
             self.current_step += 1
             return True
@@ -110,7 +110,7 @@ def test_trader(prices: list, step: float, start: float = 1000):
     return trader.result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     prices = list(range(1000, 1500)) + list(range(1500, 1000, -1))
     steps = range(50, 650, 5)
     result = [test_trader(prices, st) for st in steps]
