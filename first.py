@@ -5,9 +5,8 @@ First try, read the README.md
 @author: Quentin Lieumont
 """
 from matplotlib import pyplot as plt
-import copy
+from usefull import plot_color
 from trader import Trader
-import numpy as np
 
 
 class BTCHistory:
@@ -29,17 +28,17 @@ class BTCHistory:
     @property
     def plot(self) -> plt.Figure:
         # noinspection PyTypeChecker
-        fig, axs = plt.subplots(nrows=3, ncols=1, sharex=True)
+        _fig, _axs = plt.subplots(nrows=3, ncols=1, sharex=True)
 
         for i in range(3):
-            axs[i].plot(
+            _axs[i].plot(
                 [e[self.labels[i]] for e in self._prices_history],
                 "+--",
                 color=self.colors[i],
             )
-            axs[i].set_ylabel(self.labels[i])
+            _axs[i].set_ylabel(self.labels[i])
 
-        return fig
+        return _fig
 
     @property
     def result(self):
@@ -47,7 +46,6 @@ class BTCHistory:
 
 
 class FirstBTCTrader(Trader):
-
     btc_price: float
     obj: float
     step: float
@@ -110,11 +108,16 @@ def test_trader(prices: list, step: float, start: float = 1000):
     return trader.result
 
 
-if __name__ == "__main__":
-    prices = list(range(1000, 1500)) + list(range(1500, 1000, -1))
-    steps = range(50, 650, 5)
-    result = [test_trader(prices, st) for st in steps]
+def test_trader_2d(prices: list, price_range: iter, step_range: iter, nb_points: int = 20):
+    _steps = range(min(step_range), max(step_range), int((max(step_range)-min(step_range))/nb_points))
+    _starts = range(min(price_range), max(price_range), int((max(price_range)-min(price_range))/nb_points))
+    result = [[test_trader(prices, step, start) for step in _steps] for start in _starts]
 
-    fig, ax = plt.subplots()
-    ax.plot(steps, result, ".k")
+    return plot_color(result, _steps, _starts)
+
+
+if __name__ == "__main__":
+    _prices = list(range(1000, 1500)) + list(range(1500, 1000, -1))
+
+    fig = test_trader_2d(_prices, [500, 2000], [50, 650])
     fig.show()
