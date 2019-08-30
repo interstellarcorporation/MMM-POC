@@ -12,12 +12,13 @@ class Trader:
     The trader class which can sell and buy a list of currencies with a given exchange rate
     """
 
-    def __init__(self, currencies: list, base_founds: dict = None):
+    def __init__(self, currencies: list, base_founds: dict = None, trading_price: float = 0):
         """
         Basic initialisation
         :param currencies: all currencies that can be hold by the trader.
         :param base_founds: some founds to start trading
         """
+        self.trading_price = trading_price
         self.founds = {c: 0 for c in currencies}
         if base_founds is not None:
             for cur, value in base_founds.items():
@@ -41,7 +42,7 @@ class Trader:
         :param exchange: the exchange rate : c1 = exchange * c2
         """
         if self._check_in_currencies(c1) and self._check_in_currencies(c2):
-            self.founds[c1] -= amount * exchange
+            self.founds[c1] -= amount * exchange + self.trading_price
             self.founds[c2] += amount
             self.history.append(copy.deepcopy(self.founds))
 
@@ -60,7 +61,7 @@ class Trader:
     def _check_in_currencies(self, key):
         if key not in self.currencies:
             raise AttributeError(
-                f"currencie in founds not recognized :\n\t{key} not in {self.currencies}"
+                f"Currency in founds not recognized :\n\t{key} not in {self.currencies}"
             )
         else:
             return True
