@@ -5,7 +5,7 @@ First try, read the README.md
 @author: Quentin Lieumont
 """
 from matplotlib import pyplot as plt
-from usefull import plot_color
+from usefull import plot_color, get_json
 from trader import Trader
 
 
@@ -110,14 +110,16 @@ def test_trader(prices: list, step: float, start: float = 1000):
 
 def test_trader_2d(prices: list, price_range: iter, step_range: iter, nb_points: int = 20):
     _steps = range(min(step_range), max(step_range), int((max(step_range)-min(step_range))/nb_points))
-    _starts = range(min(price_range), max(price_range), int((max(price_range)-min(price_range))/nb_points))
+    _starts = range(max(price_range), min(price_range), -int((max(price_range)-min(price_range))/nb_points))
     result = [[test_trader(prices, step, start) for step in _steps] for start in _starts]
 
     return plot_color(result, _steps, _starts)
 
 
 if __name__ == "__main__":
-    _prices = list(range(1000, 1500)) + list(range(1500, 1000, -1))
+    # _prices = list(range(1000, 1500)) + list(range(1500, 1000, -1))
+    _prices = [e["price"] for e in get_json("all_prices.json")]
+    _prices = _prices + list(reversed(_prices))
 
-    fig = test_trader_2d(_prices, [500, 2000], [50, 650])
+    fig = test_trader_2d(_prices, [1000, 12000], [1, 1000], nb_points=10)
     fig.show()

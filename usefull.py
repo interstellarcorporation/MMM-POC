@@ -6,6 +6,18 @@ Usefull functions
 """
 from matplotlib import pyplot as plt
 import numpy as np
+import json
+
+
+def get_json(link: str):
+    return json.load(open(link, "r"))
+
+
+def write_json(link: str, data) -> None:
+    _json = json.dumps(data, sort_keys=True, indent=4, separators=(",", ": "))
+    with open(link, "w") as f:
+        for l in _json.split("\n"):
+            f.write(l)
 
 
 def nmap(func: callable, l) -> np.array:
