@@ -51,38 +51,49 @@ class FirstBTCTrader(Trader):
     step: float
     price_history: BTCHistory
 
-    def __init__(self, obj: float, step: float):
+    def __init__(self, obj: float, step: float, is_debuging: bool = False, **kargs):
         """
         :param obj: in USD
         :param step: in USD
         """
+        self.is_debugging = is_debuging
         self.obj = obj
         self.step = step
         self.current_step = 0
         self.price_history = BTCHistory(self.obj)
-        super().__init__(["USD", "BTC"], {"BTC": 1})
+        super().__init__(["USD", "BTC"], {"BTC": 1}, **kargs)
+        self.debug(f"obj={self.obj}\tstep={self.step}")
 
     def update(self, btc_price: float) -> None:
         self.btc_price = btc_price
 
+    def debug(self, msg) -> None:
+        if self.is_debugging:
+            print(msg)
+
     def run(self) -> None:
+        self.debug(f"Trying with {self.btc_price}")
         if self._check_block():
+            self.debug("\t YES")
             self.got_to_obj()
         else:
-            pass
+            self.debug("\t NO")
 
     def got_to_obj(self) -> None:
         goal = self.obj / self.btc_price
-        # print(f"{goal} BTC = {goal*self.btc_price} USD")
         delta = goal - self.founds["BTC"]
-        self.trade("USD", "BTC", delta, self.btc_price)
+        self.trade("USD", "BTC", delta, 1 / self.btc_price)
         self.price_history.update_prices(self.founds, self.btc_price)
+        self.debug(f"{goal} BTC = {goal*self.btc_price} USD")
+        if self.is_debugging:
+            self.print_all()
 
     def plot_history(self) -> None:
         self.price_history.plot.show()
 
     def _check_block(self) -> bool:
         middle = self.obj + self.current_step * self.step
+        self.debug(f"testing with {middle - self.step} - {middle + self.step}")
         if self.btc_price >= middle + self.step:
             self.current_step += 1
             return True
@@ -97,8 +108,14 @@ class FirstBTCTrader(Trader):
         return self.price_history.result
 
 
-def test_trader(prices: list, step: float, start: float = 1000):
-    trader = FirstBTCTrader(start, step)
+def test_trader(
+    prices: list,
+    start: float,
+    step: float,
+    debug: bool = False,
+    trading_price: float = 10,
+):
+    trader = FirstBTCTrader(start, step, trading_price=trading_price, is_debuging=debug)
 
     for price in prices:
         trader.update(price)
@@ -108,10 +125,30 @@ def test_trader(prices: list, step: float, start: float = 1000):
     return trader.result
 
 
-def test_trader_2d(prices: list, price_range: iter, step_range: iter, nb_points: int = 20):
-    _steps = range(min(step_range), max(step_range), int((max(step_range)-min(step_range))/nb_points))
-    _starts = range(max(price_range), min(price_range), -int((max(price_range)-min(price_range))/nb_points))
-    result = [[test_trader(prices, step, start) for step in _steps] for start in _starts]
+def test_trader_2d(
+    prices: list,
+    price_range: iter,
+    step_range: iter,
+    nb_points: int = 20,
+    trading_price: float = 10,
+):
+    _steps = range(
+        min(step_range),
+        max(step_range),
+        int((max(step_range) - min(step_range)) / nb_points),
+    )
+    _starts = range(
+        max(price_range),
+        min(price_range),
+        -int((max(price_range) - min(price_range)) / nb_points),
+    )
+    result = [
+        [
+            test_trader(prices, start, step, trading_price=trading_price)
+            for step in _steps
+        ]
+        for start in _starts
+    ]
 
     return plot_color(result, _steps, _starts)
 
@@ -121,5 +158,7 @@ if __name__ == "__main__":
     _prices = [e["price"] for e in get_json("all_prices.json")]
     _prices = _prices + list(reversed(_prices))
 
-    fig = test_trader_2d(_prices, [1000, 12000], [1, 1000], nb_points=10)
+    fig = test_trader_2d(
+        _prices, [1000, 12000], [1, 1000], nb_points=10, trading_price=0
+    )
     fig.show()

@@ -12,7 +12,9 @@ class Trader:
     The trader class which can sell and buy a list of currencies with a given exchange rate
     """
 
-    def __init__(self, currencies: list, base_founds: dict = None, trading_price: float = 0):
+    def __init__(
+        self, currencies: list, base_founds: dict = None, trading_price: float = 0
+    ):
         """
         Basic initialisation
         :param currencies: all currencies that can be hold by the trader.
@@ -42,8 +44,8 @@ class Trader:
         :param exchange: the exchange rate : c1 = exchange * c2
         """
         if self._check_in_currencies(c1) and self._check_in_currencies(c2):
-            self.founds[c1] -= amount * exchange + self.trading_price
-            self.founds[c2] += amount
+            self.founds[c1] -= amount + self.trading_price
+            self.founds[c2] += amount * exchange
             self.history.append(copy.deepcopy(self.founds))
 
     # Properties
@@ -71,21 +73,21 @@ if __name__ == "__main__":
     print("Trader class manipulation :")
 
     print("")
-    print('>>> list_of_coins = ["ACoin","BCoin"]')
+    print('>>> list_of_coins = ["USD","BTC"]')
     print('>>> starting_founds = {"a": 2}')
     print(">>> trader = Trader(list_of_coins,starting_founds)")
     print(">>> trader.print_all()")
     print("")
 
-    list_of_coins = ["ACoin", "BCoin"]
-    starting_founds = {"ACoin": 2}
-    trader = Trader(list_of_coins, starting_founds)
+    list_of_coins = ["USD", "BTC"]
+    starting_founds = {"USD": 2000}
+    trader = Trader(list_of_coins, starting_founds, trading_price=10)
     trader.print_all()
 
     print("")
-    print('>>> trader.trade("ACoin", "BCoin", 1, 100)')
+    print('>>> trader.trade("USD", "BTC", 1, 100)')
     print(">>> trader.print_all()")
     print("")
 
-    trader.trade("ACoin", "BCoin", 1, 100)
+    trader.trade("USD", "BTC", 1000, 1 / 1000)
     trader.print_all()
